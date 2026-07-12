@@ -4,9 +4,6 @@ from datetime import datetime, timedelta
 
 
 def get_upcoming_earnings(portfolio, days=14):
-    """
-    保有銘柄の決算予定を取得
-    """
 
     api_key = os.getenv("FMP_API_KEY")
 
@@ -17,13 +14,12 @@ def get_upcoming_earnings(portfolio, days=14):
 
     earnings_list = []
 
-    # portfolioから自動取得
     tickers = []
 
     for item in portfolio.get("holdings", []):
+
         ticker = item.get("ticker")
 
-        # ETFや特殊項目を除外
         if ticker and ticker not in [
             "S&P500",
             "OTHER_US",
@@ -36,62 +32,47 @@ def get_upcoming_earnings(portfolio, days=14):
     future = today + timedelta(days=days)
 
 
-    for ticker in tickers:
-
-        url = (
-            "https://financialmodelingprep.com/api/v3/earning_calendar"
-            f"?from={today.strftime('%Y-%m-%d')}"
-            f"&to={future.strftime('%Y-%m-%d')}"
-            f"&apikey={api_key}"
-        )
-
-        try:
-            response = requests.get(url)
-            data = response.json()
-
-            for item in data:
-
-                if item.get("symbol") == ticker:
-
-                    earnings_list.append(
-                        {
-                            "ticker": ticker,
-                            "date": item.get("date"),
-                            "epsEstimated": item.get("epsEstimated"),
-                            "revenueEstimated": item.get("revenueEstimated")
-                        }
-                    )
+    url = (
+        "https://financialmodelingprep.com/api/v3/earning_calendar"
+        f"?from={today.strftime('%Y-%m-%d')}"
+        f"&to={future.strftime('%Y-%m-%d')}"
+        f"&apikey={api_key}"
+    )
 
 
-        except Exception as e:
+    try:
 
-            earnings_list.append(
-                {
-                    "ticker": ticker,
-                    "error": str(e)
-                }
-            )
+        response = requests.get(url, timeout=10)
+        data = response.json()
 
 
-    return earnings_list            response = requests.get(url, timeout=10)
-            data = response.json()
+        if not isinstance(data, list):
+            return {
+                "error": data
+            }
 
-            if isinstance(data, list) and len(data) > 0:
 
-                earnings = data[0]
+        for item in data:
 
-                earnings_list.append({
-                    "ticker": ticker,
-                    "date": earnings.get("date"),
-                    "epsEstimated": earnings.get("epsEstimated"),
-                    "revenueEstimated": earnings.get("revenueEstimated")
-                })
+            symbol = item.get("symbol")
 
-        except Exception as e:
+            if symbol in tickers:
 
-            earnings_list.append({
-                "ticker": ticker,
-                "error": str(e)
-            })
+                earnings_list.append(
+                    {
+                        "ticker": symbol,
+                        "date": item.get("date"),
+                        "epsEstimated": item.get("epsEstimated"),
+                        "revenueEstimated": item.get("revenueEstimated")
+                    }
+                )
+
+
+    except Exception as e:
+
+        return {
+            "error": str(e)
+        }
+
 
     return earnings_list
