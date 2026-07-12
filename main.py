@@ -28,7 +28,7 @@ with open("portfolio.json", "r", encoding="utf-8") as f:
 # 市場データ取得
 market_data = get_market_data()    
 
-earnings = get_upcoming_earnings()。
+earnings = get_upcoming_earnings()
 
 portfolio_impact = calculate_portfolio_impact(
     portfolio,
