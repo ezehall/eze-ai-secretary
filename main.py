@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 import json
 from market_data import get_market_data
+from news_data import get_market_news
 
 from linebot.v3.messaging import (
     Configuration,
