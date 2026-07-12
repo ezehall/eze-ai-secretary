@@ -1,34 +1,102 @@
 {
+  "investor_profile": {
+    "investment_style": "長期成長投資",
+    "investment_horizon": "5年以上",
+    "main_themes": [
+      "AI",
+      "半導体",
+      "量子コンピュータ",
+      "次世代エネルギー"
+    ],
+    "preferences": [
+      "高成長企業を重視",
+      "技術優位性を重視",
+      "短期的な値動きより将来成長性を重視"
+    ],
+    "risk_management": [
+      "集中投資リスクを確認する",
+      "過熱した銘柄には警告する",
+      "長期視点で評価する"
+    ]
+  },
   "holdings": [
     {
-      "name": "IonQ",
       "ticker": "IONQ",
-      "amount": 600000
+      "name": "IonQ",
+      "amount_yen": 600000,
+      "category": "量子コンピュータ個別株"
     },
     {
-      "name": "IONQ 2倍ETF",
       "ticker": "IONL",
-      "amount": 1200000
+      "name": "IonQ 2倍ETF",
+      "amount_yen": 1200000,
+      "category": "量子コンピュータレバレッジETF"
     },
     {
-      "name": "Rigetti Computing",
       "ticker": "RGTI",
-      "amount": 600000
+      "name": "Rigetti Computing",
+      "amount_yen": 600000,
+      "category": "量子コンピュータ個別株"
     },
     {
-      "name": "NVIDIA",
+      "ticker": "ARQQ",
+      "name": "Arqit Quantum",
+      "amount_yen": 500000,
+      "category": "量子コンピュータ個別株"
+    },
+    {
+      "ticker": "Quantum_Other",
+      "name": "その他量子関連",
+      "amount_yen": 400000,
+      "category": "量子コンピュータ関連"
+    },
+    {
       "ticker": "NVDA",
-      "amount": 400000
+      "name": "NVIDIA",
+      "amount_yen": 400000,
+      "category": "AI半導体"
     },
     {
-      "name": "Google",
+      "ticker": "MU",
+      "name": "Micron Technology",
+      "amount_yen": 200000,
+      "category": "半導体メモリ"
+    },
+    {
+      "ticker": "ARM",
+      "name": "Arm Holdings",
+      "amount_yen": 300000,
+      "category": "半導体設計"
+    },
+    {
       "ticker": "GOOGL",
-      "amount": 100000
+      "name": "Alphabet",
+      "amount_yen": 100000,
+      "category": "AIプラットフォーム"
     },
     {
-      "name": "SP500投信",
+      "ticker": "AVGO",
+      "name": "Broadcom",
+      "amount_yen": 100000,
+      "category": "AI半導体"
+    },
+    {
+      "ticker": "OKLO",
+      "name": "Oklo",
+      "amount_yen": 200000,
+      "category": "次世代エネルギー"
+    },
+    {
       "ticker": "S&P500",
-      "amount": 200000
+      "name": "S&P500投資信託",
+      "amount_yen": 200000,
+      "category": "インデックス"
+    },
+    {
+      "ticker": "OTHER_US",
+      "name": "その他米国株",
+      "amount_yen": 200000,
+      "category": "米国株"
     }
   ]
 }
