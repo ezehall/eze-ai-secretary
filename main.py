@@ -2,7 +2,14 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 import json
-from linebot.v3.messaging import Configuration, ApiClient, MessagingApi, PushMessageRequest, TextMessage
+
+from linebot.v3.messaging import (
+    Configuration,
+    ApiClient,
+    MessagingApi,
+    PushMessageRequest,
+    TextMessage
+)
 
 load_dotenv()
 
@@ -29,9 +36,12 @@ prompt = f"""
 
 ・今日注目すべきニュース
 ・保有銘柄への影響
-・リスク
+・AI関連株の動向
+・量子コンピュータ関連株の動向
+・リスク要因
 ・今日の投資判断ポイント
 
+読みやすく、スマホで見やすい文章にしてください。
 """
 
 response = client.responses.create(
@@ -43,15 +53,16 @@ message = response.output_text
 
 print(message)
 
+
 # LINE送信
 configuration = Configuration(
     access_token=os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
 )
 
 with ApiClient(configuration) as api_client:
-    line_bot_api = MessagingApi(api_client)
+    line_api = MessagingApi(api_client)
 
-    line_bot_api.push_message(
+    line_api.push_message(
         PushMessageRequest(
             to=os.getenv("LINE_USER_ID"),
             messages=[
@@ -59,3 +70,5 @@ with ApiClient(configuration) as api_client:
             ]
         )
     )
+
+print("LINE送信完了")
