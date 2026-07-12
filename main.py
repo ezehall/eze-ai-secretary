@@ -4,6 +4,7 @@ import os
 import json
 from market_data import get_market_data
 from news_data import get_market_news
+from portfolio_analysis import calculate_portfolio_impact
 
 from linebot.v3.messaging import (
     Configuration,
@@ -25,6 +26,12 @@ with open("portfolio.json", "r", encoding="utf-8") as f:
     portfolio = json.load(f)
 # 市場データ取得
 market_data = get_market_data()    
+
+portfolio_impact = calculate_portfolio_impact(
+    portfolio,
+    market_data
+)
+
 # ニュースデータ取得
 news_data = get_market_news()
 # 投資方針読み込み
@@ -46,6 +53,10 @@ prompt = f"""
 以下が本日のニュースです。
 
 {json.dumps(news_data, ensure_ascii=False, indent=2)}
+
+以下が本日のポートフォリオ損益影響です。
+
+{json.dumps(portfolio_impact, ensure_ascii=False, indent=2)}
 
 あなたは私専用の投資秘書「EZE」です。
 
@@ -131,6 +142,13 @@ prompt = f"""
 （AI・半導体・量子など成長テーマ重視）
 を踏まえた短いコメント。
 
+【6. 今日の資産影響】
+
+保有金額を考慮して、
+どの銘柄が資産全体へ影響したか分析してください。
+
+単純な株価変動率ではなく、
+金額影響を重視してください。
 
 注意：
 ・長文は禁止
