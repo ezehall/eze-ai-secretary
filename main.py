@@ -53,7 +53,8 @@ message = response.output_text
 
 print(message)
 
-
+print("TOKEN exists:", bool(os.getenv("LINE_CHANNEL_ACCESS_TOKEN")))
+print("USER exists:", bool(os.getenv("LINE_USER_ID")))
 # LINE送信
 configuration = Configuration(
     access_token=os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
