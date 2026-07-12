@@ -5,6 +5,7 @@ import json
 from market_data import get_market_data
 from news_data import get_market_news
 from portfolio_analysis import calculate_portfolio_impact
+from earnings_calendar import get_upcoming_earnings。
 
 from linebot.v3.messaging import (
     Configuration,
@@ -27,6 +28,8 @@ with open("portfolio.json", "r", encoding="utf-8") as f:
 # 市場データ取得
 market_data = get_market_data()    
 
+earnings = get_upcoming_earnings()。
+
 portfolio_impact = calculate_portfolio_impact(
     portfolio,
     market_data
@@ -34,6 +37,7 @@ portfolio_impact = calculate_portfolio_impact(
 
 # ニュースデータ取得
 news_data = get_market_news()
+
 # 投資方針読み込み
 with open("strategy.txt", "r", encoding="utf-8") as f:
     strategy = f.read()    
@@ -53,6 +57,7 @@ prompt = f"""
 以下が本日のニュースです。
 
 {json.dumps(news_data, ensure_ascii=False, indent=2)}
+。
 
 以下が本日のポートフォリオ損益影響です。
 
@@ -149,6 +154,17 @@ prompt = f"""
 
 単純な株価変動率ではなく、
 金額影響を重視してください。
+
+【決算予定】
+
+以下の決算予定銘柄について分析してください。
+
+・発表日
+・重要度
+・投資判断への影響
+・決算で確認すべきポイント
+
+特に保有銘柄を優先してください。
 
 注意：
 ・長文は禁止
