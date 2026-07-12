@@ -59,7 +59,7 @@ prompt = f"""
 {json.dumps(news_data, ensure_ascii=False, indent=2)}
 。
 
-以下が決算予定情報です。
+以下が保有銘柄の決算予定です。
 
 {json.dumps(earnings, ensure_ascii=False, indent=2)}
 
