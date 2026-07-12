@@ -1,37 +1,58 @@
-import datetime
+import os
+import requests
+import json
 
 
 def get_upcoming_earnings():
 
-    # 仮データ
-    # 後でAPI取得に変更
+    api_key = os.getenv("FMP_API_KEY")
 
-    earnings = [
-        {
-            "ticker": "NVDA",
-            "name": "NVIDIA",
-            "date": "2026-08-20",
-            "importance": "★★★★★"
-        },
-        {
-            "ticker": "GOOGL",
-            "name": "Alphabet",
-            "date": "2026-07-28",
-            "importance": "★★★★"
+    if not api_key:
+        return {
+            "error": "FMP_API_KEY is missing"
         }
+
+    tickers = [
+        "NVDA",
+        "GOOGL",
+        "AVGO",
+        "ARM",
+        "MU",
+        "IONQ",
+        "RGTI",
+        "ARQQ",
+        "OKLO"
     ]
 
-    today = datetime.date.today()
+    earnings_list = []
 
-    upcoming = []
+    for ticker in tickers:
 
-    for item in earnings:
-        date = datetime.date.fromisoformat(item["date"])
+        url = (
+            "https://financialmodelingprep.com/stable/earnings-calendar?"
+            f"symbol={ticker}&apikey={api_key}"
+        )
 
-        diff = (date - today).days
+        try:
+            response = requests.get(url, timeout=10)
+            data = response.json()
 
-        if 0 <= diff <= 14:
-            item["days_left"] = diff
-            upcoming.append(item)
+            if isinstance(data, list) and len(data) > 0:
 
-    return upcoming
+                earnings = data[0]
+
+                earnings_list.append({
+                    "ticker": ticker,
+                    "date": earnings.get("date"),
+                    "epsEstimated": earnings.get("epsEstimated"),
+                    "revenueEstimated": earnings.get("revenueEstimated")
+                })
+
+        except Exception as e:
+
+            earnings_list.append({
+                "ticker": ticker,
+                "error": str(e)
+            })
+
+    return earnings_list    return upcoming
