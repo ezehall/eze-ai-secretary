@@ -1,1 +1,34 @@
-
+{
+  "holdings": [
+    {
+      "name": "IonQ",
+      "ticker": "IONQ",
+      "amount": 600000
+    },
+    {
+      "name": "IONQ 2倍ETF",
+      "ticker": "IONL",
+      "amount": 1200000
+    },
+    {
+      "name": "Rigetti Computing",
+      "ticker": "RGTI",
+      "amount": 600000
+    },
+    {
+      "name": "NVIDIA",
+      "ticker": "NVDA",
+      "amount": 400000
+    },
+    {
+      "name": "Google",
+      "ticker": "GOOGL",
+      "amount": 100000
+    },
+    {
+      "name": "SP500投信",
+      "ticker": "S&P500",
+      "amount": 200000
+    }
+  ]
+}
