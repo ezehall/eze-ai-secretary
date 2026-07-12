@@ -59,6 +59,10 @@ prompt = f"""
 {json.dumps(news_data, ensure_ascii=False, indent=2)}
 。
 
+以下が決算予定情報です。
+
+{json.dumps(earnings, ensure_ascii=False, indent=2)}
+
 以下が本日のポートフォリオ損益影響です。
 
 {json.dumps(portfolio_impact, ensure_ascii=False, indent=2)}
