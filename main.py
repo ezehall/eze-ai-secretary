@@ -5,7 +5,7 @@ import json
 from market_data import get_market_data
 from news_data import get_market_news
 from portfolio_analysis import calculate_portfolio_impact
-from earnings_calendar import get_upcoming_earnings。
+from earnings_calendar import get_upcoming_earnings
 
 from linebot.v3.messaging import (
     Configuration,
