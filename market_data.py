@@ -4,20 +4,32 @@ import yfinance as yf
 def get_market_data():
 
     tickers = {
-        "S&P500": "^GSPC",
-        "NASDAQ": "^IXIC",
-        "Dow Jones": "^DJI",
-        "VIX": "^VIX",
-        "USDJPY": "JPY=X",
-        "NVIDIA": "NVDA",
-        "IonQ": "IONQ",
-        "Rigetti": "RGTI",
-        "Arqit": "ARQQ",
-        "Alphabet": "GOOGL",
-        "Broadcom": "AVGO",
-        "ARM": "ARM",
-        "Micron": "MU",
-        "Oklo": "OKLO"
+    "S&P500": "^GSPC",
+    "NASDAQ": "^IXIC",
+    "Dow Jones": "^DJI",
+    "VIX": "^VIX",
+
+    "USDJPY": "JPY=X",
+
+    # 金利関連
+    "US10Year": "^TNX",
+    "US2Year": "^IRX",
+
+    # AI・半導体
+    "NVIDIA": "NVDA",
+    "Alphabet": "GOOGL",
+    "Broadcom": "AVGO",
+    "ARM": "ARM",
+    "Micron": "MU",
+
+    # 量子関連
+    "IonQ": "IONQ",
+    "IONL": "IONL",
+    "Rigetti": "RGTI",
+    "Arqit": "ARQQ",
+
+    # 次世代エネルギー
+    "Oklo": "OKLO"
     }
 
     result = {}
