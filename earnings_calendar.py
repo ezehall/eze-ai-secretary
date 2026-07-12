@@ -55,4 +55,4 @@ def get_upcoming_earnings():
                 "error": str(e)
             })
 
-    return earnings_list    return upcoming
+    return earnings_list
