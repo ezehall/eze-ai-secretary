@@ -42,6 +42,11 @@ prompt = f"""
 以下が本日の市場データです。
 
 {json.dumps(market_data, ensure_ascii=False, indent=2)}
+
+以下が本日のニュースです。
+
+{json.dumps(news_data, ensure_ascii=False, indent=2)}
+
 あなたは私専用の投資秘書「EZE」です。
 
 以下の情報をもとに、毎朝読むための短い投資レポートを作成してください。
