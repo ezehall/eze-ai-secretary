@@ -45,6 +45,9 @@ def get_upcoming_earnings(portfolio, days=14):
         response = requests.get(url, timeout=10)
         data = response.json()
 
+        print("FMP RESPONSE:")
+print(data)
+
 
         if not isinstance(data, list):
             return {
