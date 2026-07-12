@@ -25,6 +25,8 @@ with open("portfolio.json", "r", encoding="utf-8") as f:
     portfolio = json.load(f)
 # 市場データ取得
 market_data = get_market_data()    
+# ニュースデータ取得
+news_data = get_market_news()
 # 投資方針読み込み
 with open("strategy.txt", "r", encoding="utf-8") as f:
     strategy = f.read()    
