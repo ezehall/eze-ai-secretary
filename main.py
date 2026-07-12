@@ -2,6 +2,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 import json
+from market_data import get_market_data
 
 from linebot.v3.messaging import (
     Configuration,
@@ -21,6 +22,8 @@ client = OpenAI(
 # ポートフォリオ読み込み
 with open("portfolio.json", "r", encoding="utf-8") as f:
     portfolio = json.load(f)
+# 市場データ取得
+market_data = get_market_data()    
 # 投資方針読み込み
 with open("strategy.txt", "r", encoding="utf-8") as f:
     strategy = f.read()    
@@ -33,6 +36,9 @@ prompt = f"""
 
 {json.dumps(portfolio, ensure_ascii=False, indent=2)}
 
+以下が本日の市場データです。
+
+{json.dumps(market_data, ensure_ascii=False, indent=2)}
 今日の米国株市場について、
 私専用の投資レポートを作成してください。
 
