@@ -9,32 +9,56 @@ def calculate_portfolio_impact(portfolio, market_data):
         if ticker not in market_data:
             continue
 
-        change = market_data[ticker].get("change_percent")
+        data = market_data[ticker]
 
-        if change is None:
+        if "price" not in data:
             continue
 
-        # 旧形式(amount_yen)
-        if "amount_yen" in item:
-            amount = item["amount_yen"]
+        current_price = data["price"]
+        change = data["change_percent"]
 
-        # 新形式(株数 × 平均取得単価)
-        elif "shares" in item and "average_price" in item:
+        # 日本株・米国株
+        if "shares" in item:
 
-            amount = item["shares"] * item["average_price"]
+            shares = item["shares"]
+            average_price = item["average_price"]
 
-            # 米国株なら円換算
-            if ticker.endswith(".T") is False and ticker != "7272":
-                usdjpy = market_data["JPY=X"]["price"]
-                amount *= usdjpy
+            cost = shares * average_price
+            market_value = shares * current_price
+            today_impact = market_value * (change / 100)
 
         # 投資信託
-        elif "units" in item and "average_price" in item:
+        elif "units" in item:
 
-            amount = item["units"] * item["average_price"] / 10000
+            units = item["units"]
+            average_price = item["average_price"]
+
+            cost = average_price * units / 10000
+            market_value = current_price * units / 10000
+            today_impact = market_value * (change / 100)
 
         else:
             continue
+
+        unrealized = market_value - cost
+
+        results.append({
+            "ticker": ticker,
+            "name": item["name"],
+            "cost_yen": round(cost),
+            "market_value_yen": round(market_value),
+            "unrealized_yen": round(unrealized),
+            "unrealized_percent": round(unrealized / cost * 100, 2) if cost else 0,
+            "today_change_percent": change,
+            "today_impact_yen": round(today_impact)
+        })
+
+    results.sort(
+        key=lambda x: x["today_impact_yen"],
+        reverse=True
+    )
+
+    return results            continue
 
         impact = amount * (change / 100)
 
