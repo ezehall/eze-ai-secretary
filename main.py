@@ -106,15 +106,13 @@ prompt = f"""
 株価変化：
 コメント：
 
-対象：
-現在のportfolio.jsonに登録されている保有銘柄を対象にしてください。
+対象銘柄はportfolio.jsonの保有銘柄のみ。
 
-ただし、
-S&P500投資信託
-OTHER_US
-Quantum_Other
-など個別株ではないものは除外してください。
-IONLだけは特別含んでください。
+※これは出力しないこと。
+
+個別株のみ表示し、
+Quantum_Other・OTHER_US・AI_INDEX・S&P500投資信託は除外。
+IONLは例外として表示する。
 
 
 【3. 今日の投資判断】
