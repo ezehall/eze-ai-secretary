@@ -1,5 +1,6 @@
 def calculate_portfolio_impact(portfolio, market_data):
 
+    # USD/JPY取得
     usd_jpy = market_data["JPY=X"]["price"]
 
     results = []
@@ -9,11 +10,36 @@ def calculate_portfolio_impact(portfolio, market_data):
     total_today_impact = 0
 
 
+    # 除外対象
+    exclude_tickers = [
+        "S&P500",
+        "AI_INDEX",
+        "Quantum_Other",
+        "OTHER_US"
+    ]
+
+
     for item in portfolio["holdings"]:
 
         ticker = item["ticker"]
 
 
+        # 投信・その他枠を除外
+        if ticker in exclude_tickers:
+            continue
+
+
+        # 株数がないものは除外
+        if "shares" not in item:
+            continue
+
+
+        # 0株は除外
+        if item["shares"] <= 0:
+            continue
+
+
+        # 市場データなし
         if ticker not in market_data:
             continue
 
@@ -21,7 +47,12 @@ def calculate_portfolio_impact(portfolio, market_data):
         data = market_data[ticker]
 
 
+        # 株価なし
         if "price" not in data:
+            continue
+
+
+        if "change_percent" not in data:
             continue
 
 
@@ -29,47 +60,28 @@ def calculate_portfolio_impact(portfolio, market_data):
         change = data["change_percent"]
 
 
-        if "shares" in item:
-
-            shares = item["shares"]
-            average_price = item["average_price"]
+        shares = item["shares"]
+        average_price = item["average_price"]
 
 
-            if ticker.isdigit():
+        # 日本株
+        if item.get("currency") == "JPY":
 
-                cost = shares * average_price
-                market_value = shares * current_price
+            cost = shares * average_price
 
-
-            else:
-
-                cost = shares * average_price * usd_jpy
-                market_value = shares * current_price * usd_jpy
+            market_value = shares * current_price
 
 
-
-            today_impact = market_value * (change / 100)
-
-
-
-        elif "units" in item:
-
-            units = item["units"]
-            average_price = item["average_price"]
-
-
-            cost = average_price * units / 10000
-
-            market_value = current_price * units / 10000
-
-            today_impact = market_value * (change / 100)
-
-
-
+        # 米国株・ETF
         else:
 
-            continue
+            cost = shares * average_price * usd_jpy
 
+            market_value = shares * current_price * usd_jpy
+
+
+
+        today_impact = market_value * (change / 100)
 
 
         unrealized = market_value - cost
@@ -94,7 +106,10 @@ def calculate_portfolio_impact(portfolio, market_data):
             "unrealized_yen": round(unrealized),
 
             "unrealized_percent":
-                round(unrealized / cost * 100, 2)
+                round(
+                    unrealized / cost * 100,
+                    2
+                )
                 if cost else 0,
 
             "today_change_percent": change,
@@ -104,36 +119,43 @@ def calculate_portfolio_impact(portfolio, market_data):
         })
 
 
+    # 前日比影響額が大きい順
     results.sort(
         key=lambda x: x["today_impact_yen"],
         reverse=True
     )
 
 
-    return {
+    summary = {
 
-        "summary": {
+        "total_cost_yen":
+            round(total_cost),
 
-            "total_cost_yen": round(total_cost),
+        "total_market_value_yen":
+            round(total_market_value),
 
-            "total_market_value_yen": round(total_market_value),
-
-            "total_unrealized_yen": round(
+        "total_unrealized_yen":
+            round(
                 total_market_value - total_cost
             ),
 
-            "total_unrealized_percent":
-                round(
-                    (total_market_value - total_cost)
-                    / total_cost * 100,
-                    2
-                )
-                if total_cost else 0,
+        "total_unrealized_percent":
+            round(
+                (total_market_value - total_cost)
+                / total_cost * 100,
+                2
+            )
+            if total_cost else 0,
 
-            "total_today_impact_yen":
-                round(total_today_impact)
+        "total_today_impact_yen":
+            round(total_today_impact)
 
-        },
+    }
+
+
+    return {
+
+        "summary": summary,
 
         "holdings": results
 
