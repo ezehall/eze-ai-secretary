@@ -1,49 +1,43 @@
+import json
 import yfinance as yf
 
 
 def get_market_data():
 
-    tickers = {
+    # portfolio.jsonから保有銘柄を読み込む
+with open("portfolio.json", "r", encoding="utf-8") as f:
+    portfolio = json.load(f)
+
+# インデックス・金利・為替（常に取得）
+tickers = {
     "S&P500": "^GSPC",
     "NASDAQ": "^IXIC",
     "Dow Jones": "^DJI",
     "VIX": "^VIX",
-
     "USDJPY": "JPY=X",
-
-    # 金利関連
     "US10Year": "^TNX",
-    "US2Year": "^IRX",
+    "US2Year": "^IRX"
+}
 
-        # AI・半導体
-    "NVIDIA": "NVDA",
-    "Alphabet": "GOOGL",
-    "Alphabet C": "GOOG",
-    "Broadcom": "AVGO",
-    "ARM": "ARM",
-    "Micron": "MU",
-    "TSMC": "TSM",
-    "Palantir": "PLTR",
+# portfolio.jsonに登録されている銘柄を自動追加
+for item in portfolio["holdings"]:
 
-    # 量子関連
-    "IonQ": "IONQ",
-    "IONL": "IONL",
-    "Rigetti": "RGTI",
-    "Arqit": "ARQQ",
-    "Quantum Computing": "QUBT",
-    "Quantum": "QMCO",
+    ticker = item["ticker"]
 
-    # ETF
-    "SOXL": "SOXL",
-    "SPCX": "SPCX",
+    # 株価取得できないものは除外
+    if ticker in [
+        "Quantum_Other",
+        "OTHER_US",
+        "S&P500",
+        "AI_INDEX"
+    ]:
+        continue
 
     # 日本株
-    "Yamaha": "7272.T",
-
-    # 次世代エネルギー
-    "Oklo": "OKLO"
-    }
-
+    if ticker.isdigit():
+        tickers[item["name"]] = ticker + ".T"
+    else:
+        tickers[item["name"]] = ticker
     result = {}
 
     for name, ticker in tickers.items():
