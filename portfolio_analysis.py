@@ -23,9 +23,15 @@ def calculate_portfolio_impact(portfolio, market_data):
             shares = item["shares"]
             average_price = item["average_price"]
 
-            cost = shares * average_price
-            market_value = shares * current_price
-            today_impact = market_value * (change / 100)
+            # 日本株は円、米国株はドル→円換算
+if ticker.isdigit():
+    cost = shares * average_price
+    market_value = shares * current_price
+else:
+    cost = shares * average_price * usd_jpy
+    market_value = shares * current_price * usd_jpy
+
+today_impact = market_value * (change / 100)
 
         # 投資信託
         elif "units" in item:
