@@ -47,8 +47,7 @@ def get_upcoming_earnings(portfolio, days=14):
 
         print("FMP RESPONSE:")
         print(data)
-　　
-
+        
         if not isinstance(data, list):
             return {
                 "error": data
