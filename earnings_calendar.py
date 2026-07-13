@@ -3,21 +3,20 @@ import requests
 from datetime import datetime, timedelta
 
 
-def get_upcoming_earnings(portfolio, days=14):
+def get_upcoming_earnings(portfolio, days=30):
 
     api_key = os.getenv("FMP_API_KEY")
 
     if not api_key:
         return {
-            "error": "FMP_API_KEY が設定されていません"
+            "error": "FMP_API_KEYがありません"
         }
 
-    earnings_list = []
+    results = []
 
     tickers = []
 
     for item in portfolio.get("holdings", []):
-
         ticker = item.get("ticker")
 
         if ticker and ticker not in [
@@ -33,7 +32,7 @@ def get_upcoming_earnings(portfolio, days=14):
 
 
     url = (
-        "https://financialmodelingprep.com/api/v3/earning_calendar"
+        "https://financialmodelingprep.com/stable/earnings-calendar"
         f"?from={today.strftime('%Y-%m-%d')}"
         f"&to={future.strftime('%Y-%m-%d')}"
         f"&apikey={api_key}"
@@ -42,32 +41,31 @@ def get_upcoming_earnings(portfolio, days=14):
 
     try:
 
-        response = requests.get(url, timeout=10)
+        response = requests.get(
+            url,
+            timeout=10
+        )
+
         data = response.json()
 
         print("取得データ:")
         print(data)
-        
-        if not isinstance(data, list):
-            return {
-                "error": data
-            }
 
 
-        for item in data:
+        if isinstance(data, list):
 
-            symbol = item.get("symbol")
+            for item in data:
 
-            if symbol in tickers:
+                if item.get("symbol") in tickers:
 
-                earnings_list.append(
-                    {
-                        "ticker": symbol,
-                        "date": item.get("date"),
-                        "epsEstimated": item.get("epsEstimated"),
-                        "revenueEstimated": item.get("revenueEstimated")
-                    }
-                )
+                    results.append(
+                        {
+                            "ticker": item.get("symbol"),
+                            "date": item.get("date"),
+                            "epsEstimated": item.get("epsEstimated"),
+                            "revenueEstimated": item.get("revenueEstimated")
+                        }
+                    )
 
 
     except Exception as e:
@@ -77,4 +75,4 @@ def get_upcoming_earnings(portfolio, days=14):
         }
 
 
-    return earnings_list
+    return results
