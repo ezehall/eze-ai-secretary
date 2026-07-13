@@ -220,25 +220,26 @@ IONLは例外として表示する。
 
 必ずportfolio_impactの数値のみを使用してください。
 
-表示内容：
+表示内容
 
 ・現在の評価額合計
-・含み損益合計（円・％）
+・取得額合計
+・含み損益（円・％）
 ・前日比（金額）
 ・プラス寄与TOP3
 ・マイナス寄与TOP3
 
+現在の評価額や含み損益は推測せず、
 portfolio_impactに含まれる
 
 market_value_yen
+cost_yen
 unrealized_yen
-unrealized_percent
 today_impact_yen
 
-のみを使って計算してください。
+を合計して算出してください。
 
-推測は禁止。
-存在しない数値は禁止。
+存在しない銘柄や推測は禁止します。
 
 【9. 決算予定】
 
