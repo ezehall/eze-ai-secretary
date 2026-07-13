@@ -44,13 +44,15 @@ def get_market_data():
 
             change = ((today - yesterday) / yesterday) * 100
 
-            result[name] = {
+            result[ticker] = {
+                "name": name,
                 "price": round(float(today), 2),
                 "change_percent": round(float(change), 2)
             }
 
         except Exception as e:
-            result[name] = {
+            result[ticker] = {
+                "name": name,
                 "error": str(e)
             }
 
