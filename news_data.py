@@ -6,6 +6,21 @@ from email.utils import parsedate_to_datetime
 import pytz
 from datetime import datetime, timezone, timedelta
 
+def convert_japan_time(date_string):
+
+    try:
+        dt = parsedate_to_datetime(date_string)
+
+        japan = pytz.timezone("Asia/Tokyo")
+
+        dt_japan = dt.astimezone(japan)
+
+        return dt_japan.strftime(
+            "%Y年%m月%d日 %H:%M"
+        )
+
+    except:
+        return "日時不明"
 
 def get_news(keyword, limit=3):
 
@@ -31,10 +46,10 @@ def get_news(keyword, limit=3):
             pub_date = item.find("pubDate").text
 
             news.append(
-                {
-                    "title": title,
-                    "date": pub_date
-                }
+    {
+        "title": title,
+        "date": convert_japan_time(pub_date)
+    }
             )
 
         return news
