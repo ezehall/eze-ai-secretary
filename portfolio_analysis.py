@@ -58,7 +58,7 @@ def calculate_portfolio_impact(portfolio, market_data):
         reverse=True
     )
 
-    return results            continue
+    return results
 
         impact = amount * (change / 100)
 
