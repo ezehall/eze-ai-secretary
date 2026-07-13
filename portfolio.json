@@ -7,27 +7,106 @@
       "半導体",
       "量子コンピュータ",
       "次世代エネルギー"
-    ],
-    "preferences": [
-      "高成長企業を重視",
-      "技術優位性を重視",
-      "短期的な値動きより将来成長性を重視"
-    ],
-    "risk_management": [
-      "集中投資リスクを確認する",
-      "過熱した銘柄には警告する",
-      "長期視点で評価する"
     ]
   },
   "holdings": [
     {
-      "ticker": "IONQ",
-      "name": "IonQ",
-      "shares": 0,
-      "average_price": 0,
+      "ticker": "7272",
+      "name": "ヤマハ発動機",
+      "shares": 100,
+      "average_price": 1098.5,
+      "currency": "JPY",
+      "account": "特定",
+      "category": "日本株"
+    },
+    {
+      "ticker": "AVGO",
+      "name": "Broadcom",
+      "shares": 2,
+      "average_price": 280.0,
       "currency": "USD",
       "account": "NISA",
-      "amount_yen": 600000,
+      "category": "AI半導体"
+    },
+    {
+      "ticker": "GOOG",
+      "name": "Alphabet Class C",
+      "shares": 1,
+      "average_price": 160.71,
+      "currency": "USD",
+      "account": "NISA",
+      "category": "AIプラットフォーム"
+    },
+    {
+      "ticker": "QMCO",
+      "name": "Quantum",
+      "shares": 15,
+      "average_price": 11.15,
+      "currency": "USD",
+      "account": "NISA",
+      "category": "量子関連"
+    },
+    {
+      "ticker": "NVDA",
+      "name": "NVIDIA",
+      "shares": 11,
+      "average_price": 108.8409,
+      "currency": "USD",
+      "account": "NISA",
+      "category": "AI半導体"
+    },
+    {
+      "ticker": "TSM",
+      "name": "TSMC",
+      "shares": 3,
+      "average_price": 134.6666,
+      "currency": "USD",
+      "account": "NISA",
+      "category": "半導体"
+    },
+    {
+      "ticker": "PLTR",
+      "name": "Palantir",
+      "shares": 3,
+      "average_price": 34.2833,
+      "currency": "USD",
+      "account": "NISA",
+      "category": "AI"
+    },
+    {
+      "ticker": "ARQQ",
+      "name": "Arqit Quantum",
+      "shares": 135,
+      "average_price": 31.837,
+      "currency": "USD",
+      "account": "NISA",
+      "category": "量子コンピュータ個別株"
+    },
+    {
+      "ticker": "QUBT",
+      "name": "Quantum Computing",
+      "shares": 145,
+      "average_price": 16.4691,
+      "currency": "USD",
+      "account": "NISA",
+      "category": "量子関連"
+    },
+    {
+      "ticker": "MU",
+      "name": "Micron Technology",
+      "shares": 1,
+      "average_price": 360.84,
+      "currency": "USD",
+      "account": "NISA",
+      "category": "半導体メモリ"
+    },
+    {
+      "ticker": "IONQ",
+      "name": "IonQ",
+      "shares": 56,
+      "average_price": 36.3166,
+      "currency": "USD",
+      "account": "NISA",
       "category": "量子コンピュータ個別株"
     },
     {
@@ -37,101 +116,85 @@
       "average_price": 0,
       "currency": "USD",
       "account": "特定",
-      "amount_yen": 1200000,
       "category": "量子コンピュータレバレッジETF"
     },
     {
       "ticker": "RGTI",
       "name": "Rigetti Computing",
-      "shares": 0,
-      "average_price": 0,
+      "shares": 225,
+      "average_price": 11.83,
       "currency": "USD",
       "account": "NISA",
-      "amount_yen": 600000,
       "category": "量子コンピュータ個別株"
-    },
-    {
-      "ticker": "ARQQ",
-      "name": "Arqit Quantum",
-      "shares": 0,
-      "average_price": 0,
-      "currency": "USD",
-      "account": "NISA",
-      "amount_yen": 500000,
-      "category": "量子コンピュータ個別株"
-    },
-    {
-      "ticker": "Quantum_Other",
-      "name": "その他量子関連",
-      "amount_yen": 400000,
-      "category": "量子コンピュータ関連"
-    },
-    {
-      "ticker": "NVDA",
-      "name": "NVIDIA",
-      "shares": 0,
-      "average_price": 0,
-      "currency": "USD",
-      "account": "NISA",
-      "amount_yen": 400000,
-      "category": "AI半導体"
-         "name": "Rigetti Computing",
-      "amount_yen": 600000,
-      "category": "量子コンピュータ個別株"
-    },
-    {
-      "ticker": "ARQQ",
-      "name": "Arqit Quantum",
-      "amount_yen": 500000,
-      "category": "量子コンピュータ個別株"
-    },
-    {
-      "ticker": "Quantum_Other",
-      "name": "その他量子関連",
-      "amount_yen": 400000,
-      "category": "量子コンピュータ関連"
-    },
-    {
-      "ticker": "NVDA",
-      "name": "NVIDIA",
-      "amount_yen": 400000,
-      "category": "AI半導体"
-    },
-    {
-      "ticker": "MU",
-      "name": "Micron Technology",
-      "amount_yen": 200000,
-      "category": "半導体メモリ"
     },
     {
       "ticker": "ARM",
       "name": "Arm Holdings",
-      "amount_yen": 300000,
+      "shares": 5,
+      "average_price": 175.436,
+      "currency": "USD",
+      "account": "NISA",
       "category": "半導体設計"
     },
     {
       "ticker": "GOOGL",
-      "name": "Alphabet",
-      "amount_yen": 100000,
+      "name": "Alphabet Class A",
+      "shares": 1,
+      "average_price": 204.01,
+      "currency": "USD",
+      "account": "NISA",
       "category": "AIプラットフォーム"
-    },
-    {
-      "ticker": "AVGO",
-      "name": "Broadcom",
-      "amount_yen": 100000,
-      "category": "AI半導体"
     },
     {
       "ticker": "OKLO",
       "name": "Oklo",
-      "amount_yen": 200000,
+      "shares": 24,
+      "average_price": 38.7525,
+      "currency": "USD",
+      "account": "NISA",
       "category": "次世代エネルギー"
     },
     {
+      "ticker": "SOXL",
+      "name": "SOXL",
+      "shares": 315,
+      "average_price": 22.1511,
+      "currency": "USD",
+      "account": "特定",
+      "category": "半導体ETF"
+    },
+    {
+      "ticker": "SPCX",
+      "name": "SPCX",
+      "shares": 3,
+      "average_price": 155.0,
+      "currency": "USD",
+      "account": "特定",
+      "category": "ETF"
+    },
+    {
       "ticker": "S&P500",
-      "name": "S&P500投資信託",
-      "amount_yen": 200000,
-      "category": "インデックス"
+      "name": "eMAXIS Slim 米国株式(S&P500)",
+      "units": 42005,
+      "average_price": 37328.35,
+      "currency": "JPY",
+      "account": "NISA",
+      "category": "投資信託"
+    },
+    {
+      "ticker": "AI_INDEX",
+      "name": "イノベーション・インデックス・AI",
+      "units": 1392,
+      "average_price": 34112.55,
+      "currency": "JPY",
+      "account": "NISA",
+      "category": "投資信託"
+    },
+    {
+      "ticker": "Quantum_Other",
+      "name": "その他量子関連",
+      "amount_yen": 400000,
+      "category": "量子関連"
     },
     {
       "ticker": "OTHER_US",
