@@ -22,7 +22,7 @@ def convert_japan_time(date_string):
     except:
         return "日時不明"
 
-def get_news(keyword, limit=3):
+def get_news(keyword, limit=2):
 
     query = urllib.parse.quote(keyword)
 
