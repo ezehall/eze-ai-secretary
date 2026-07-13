@@ -2,7 +2,7 @@ def calculate_portfolio_impact(portfolio, market_data):
 
     # USD/JPY取得
     if "JPY=X" in market_data and "price" in market_data["JPY=X"]:
-    usd_jpy = market_data["JPY=X"]["price"]
+        usd_jpy = market_data["JPY=X"]["price"]
 else:
     usd_jpy = 150
 
