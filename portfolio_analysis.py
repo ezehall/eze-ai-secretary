@@ -3,8 +3,9 @@ def calculate_portfolio_impact(portfolio, market_data):
     # USD/JPY取得
     if "JPY=X" in market_data and "price" in market_data["JPY=X"]:
         usd_jpy = market_data["JPY=X"]["price"]
-else:
-    usd_jpy = 150
+    else:
+        usd_jpy = 150
+
 
     results = []
 
@@ -27,22 +28,22 @@ else:
         ticker = item["ticker"]
 
 
-        # 投信・その他枠を除外
+        # 投資信託・その他枠を除外
         if ticker in exclude_tickers:
             continue
 
 
-        # 株数がないものは除外
+        # 株式・ETF以外を除外
         if "shares" not in item:
             continue
 
 
-        # 0株は除外
+        # 0株保有は除外
         if item["shares"] <= 0:
             continue
 
 
-        # 市場データなし
+        # 市場データがない場合
         if ticker not in market_data:
             continue
 
@@ -50,7 +51,7 @@ else:
         data = market_data[ticker]
 
 
-        # 株価なし
+        # 株価データがない場合
         if "price" not in data:
             continue
 
@@ -86,10 +87,10 @@ else:
 
         today_impact = market_value * (change / 100)
 
-
         unrealized = market_value - cost
 
 
+        # 合計計算
         total_cost += cost
         total_market_value += market_value
         total_today_impact += today_impact
