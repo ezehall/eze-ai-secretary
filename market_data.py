@@ -15,18 +15,30 @@ def get_market_data():
     "US10Year": "^TNX",
     "US2Year": "^IRX",
 
-    # AI・半導体
+        # AI・半導体
     "NVIDIA": "NVDA",
     "Alphabet": "GOOGL",
+    "Alphabet C": "GOOG",
     "Broadcom": "AVGO",
     "ARM": "ARM",
     "Micron": "MU",
+    "TSMC": "TSM",
+    "Palantir": "PLTR",
 
     # 量子関連
     "IonQ": "IONQ",
     "IONL": "IONL",
     "Rigetti": "RGTI",
     "Arqit": "ARQQ",
+    "Quantum Computing": "QUBT",
+    "Quantum": "QMCO",
+
+    # ETF
+    "SOXL": "SOXL",
+    "SPCX": "SPCX",
+
+    # 日本株
+    "Yamaha": "7272.T",
 
     # 次世代エネルギー
     "Oklo": "OKLO"
