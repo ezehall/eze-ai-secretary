@@ -23,43 +23,25 @@ def get_news(keyword, limit=3):
 
         for item in root.findall(".//item")[:limit]:
 
-    title = item.find("title").text
+            title = item.find("title").text
 
-    pub_date = item.find("pubDate").text
+            pub_date = item.find("pubDate").text
 
-    try:
-        # RSS日時を解析
-        dt = datetime.strptime(
-            pub_date,
-            "%a, %d %b %Y %H:%M:%S %Z"
-        )
-
-        # UTC → 日本時間
-        japan_time = dt.replace(
-            tzinfo=timezone.utc
-        ).astimezone(
-            timezone(timedelta(hours=9))
-        )
-
-        formatted_date = japan_time.strftime(
-            "%Y年%m月%d日 %H:%M"
-        )
-
-    except:
-        formatted_date = "日時取得不可"
-
-
-    news.append(
-        {
-            "title": title,
-            "date_japan": formatted_date
-        }
-    )
+            news.append(
+                {
+                    "title": title,
+                    "date": pub_date
+                }
+            )
 
         return news
 
     except Exception as e:
-        return [f"ニュース取得エラー: {e}"]
+        return [
+            {
+                "error": f"ニュース取得エラー: {e}"
+            }
+        ]
 
 
 
