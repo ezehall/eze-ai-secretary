@@ -1,5 +1,5 @@
 def calculate_portfolio_impact(portfolio, market_data):
-
+    usd_jpy = market_data["JPY=X"]["price"]
     results = []
 
     for item in portfolio["holdings"]:
