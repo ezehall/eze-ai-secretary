@@ -25,8 +25,12 @@ client = OpenAI(
 # ポートフォリオ読み込み
 with open("portfolio.json", "r", encoding="utf-8") as f:
     portfolio = json.load(f)
+    
 # 市場データ取得
-market_data = get_market_data()    
+market_data = get_market_data()
+
+print("JPY=X DATA")
+print(market_data.get("JPY=X")) 
 
 earnings = get_upcoming_earnings(portfolio)
 
