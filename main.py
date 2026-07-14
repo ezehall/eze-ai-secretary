@@ -329,7 +329,6 @@ today_impact_yen
 ・必ず提供されたポートフォリオに基づく
 ・数値がある場合は数値を使用
 """
-"""
 
 # AI分析生成
 response = client.responses.create(
