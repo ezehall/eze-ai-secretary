@@ -23,7 +23,7 @@
       "ticker": "AVGO",
       "name": "Broadcom",
       "shares": 2,
-      "average_price": 280.0,
+      "average_price": 280.08,
       "currency": "USD",
       "account": "NISA",
       "category": "AI半導体"
@@ -41,7 +41,7 @@
       "ticker": "QMCO",
       "name": "Quantum",
       "shares": 15,
-      "average_price": 11.15,
+      "average_price": 11.9533,
       "currency": "USD",
       "account": "NISA",
       "category": "量子関連"
@@ -50,7 +50,7 @@
       "ticker": "NVDA",
       "name": "NVIDIA",
       "shares": 11,
-      "average_price": 108.8409,
+      "average_price": 108.0436,
       "currency": "USD",
       "account": "NISA",
       "category": "AI半導体"
@@ -59,7 +59,7 @@
       "ticker": "TSM",
       "name": "TSMC",
       "shares": 3,
-      "average_price": 134.6666,
+      "average_price": 154.6666,
       "currency": "USD",
       "account": "NISA",
       "category": "半導体"
@@ -68,7 +68,7 @@
       "ticker": "PLTR",
       "name": "Palantir",
       "shares": 3,
-      "average_price": 34.2833,
+      "average_price": 94.3833,
       "currency": "USD",
       "account": "NISA",
       "category": "AI"
@@ -77,7 +77,7 @@
       "ticker": "ARQQ",
       "name": "Arqit Quantum",
       "shares": 135,
-      "average_price": 31.837,
+      "average_price": 31.8029,
       "currency": "USD",
       "account": "NISA",
       "category": "量子コンピュータ個別株"
@@ -95,7 +95,7 @@
       "ticker": "MU",
       "name": "Micron Technology",
       "shares": 1,
-      "average_price": 360.84,
+      "average_price": 980.04,
       "currency": "USD",
       "account": "NISA",
       "category": "半導体メモリ"
@@ -103,26 +103,17 @@
     {
       "ticker": "IONQ",
       "name": "IonQ",
-      "shares": 56,
-      "average_price": 36.3166,
+      "shares": 68,
+      "average_price": 36.3188,
       "currency": "USD",
       "account": "NISA",
       "category": "量子コンピュータ個別株"
     },
     {
-      "ticker": "IONL",
-      "name": "IonQ 2倍ETF",
-      "shares": 0,
-      "average_price": 0,
-      "currency": "USD",
-      "account": "特定",
-      "category": "量子コンピュータレバレッジETF"
-    },
-    {
       "ticker": "RGTI",
       "name": "Rigetti Computing",
       "shares": 225,
-      "average_price": 11.83,
+      "average_price": 11.8305,
       "currency": "USD",
       "account": "NISA",
       "category": "量子コンピュータ個別株"
@@ -131,7 +122,7 @@
       "ticker": "ARM",
       "name": "Arm Holdings",
       "shares": 5,
-      "average_price": 175.436,
+      "average_price": 125.636,
       "currency": "USD",
       "account": "NISA",
       "category": "半導体設計"
@@ -140,7 +131,7 @@
       "ticker": "GOOGL",
       "name": "Alphabet Class A",
       "shares": 1,
-      "average_price": 204.01,
+      "average_price": 394.07,
       "currency": "USD",
       "account": "NISA",
       "category": "AIプラットフォーム"
@@ -149,25 +140,25 @@
       "ticker": "OKLO",
       "name": "Oklo",
       "shares": 24,
-      "average_price": 38.7525,
+      "average_price": 58.7025,
       "currency": "USD",
       "account": "NISA",
       "category": "次世代エネルギー"
     },
     {
-      "ticker": "SOXL",
-      "name": "SOXL",
+      "ticker": "IONL",
+      "name": "GraniteShares 2倍 Long IonQ Daily ETF",
       "shares": 315,
       "average_price": 22.1511,
       "currency": "USD",
       "account": "特定",
-      "category": "半導体ETF"
+      "category": "量子コンピュータレバレッジETF"
     },
     {
       "ticker": "SPCX",
       "name": "SPCX",
       "shares": 3,
-      "average_price": 155.0,
+      "average_price": 135.0,
       "currency": "USD",
       "account": "特定",
       "category": "ETF"
@@ -175,8 +166,8 @@
     {
       "ticker": "S&P500",
       "name": "eMAXIS Slim 米国株式(S&P500)",
-      "units": 42005,
-      "average_price": 37328.35,
+      "units": 42893,
+      "average_price": 32639.36,
       "currency": "JPY",
       "account": "NISA",
       "category": "投資信託"
@@ -184,23 +175,11 @@
     {
       "ticker": "AI_INDEX",
       "name": "イノベーション・インデックス・AI",
-      "units": 1392,
-      "average_price": 34112.55,
+      "units": 7392,
+      "average_price": 54112.55,
       "currency": "JPY",
       "account": "NISA",
       "category": "投資信託"
-    },
-    {
-      "ticker": "Quantum_Other",
-      "name": "その他量子関連",
-      "amount_yen": 400000,
-      "category": "量子関連"
-    },
-    {
-      "ticker": "OTHER_US",
-      "name": "その他米国株",
-      "amount_yen": 200000,
-      "category": "米国株"
     }
   ]
 }
