@@ -1,5 +1,6 @@
 name: EZE AI Secretary Daily
 
+# updated
 on:
   schedule:
     - cron: "0 22 * * *"
@@ -30,11 +31,3 @@ jobs:
           FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
         run: |
           python main.py
-
-          name: EZE AI Secretary Daily
-
-# updated
-on:
-  schedule:
-    - cron: "0 22 * * *"
-  workflow_dispatch:
