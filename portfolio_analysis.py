@@ -159,7 +159,7 @@ for item in results:
             if total_cost else 0,
 
         "total_today_impact_yen":
-            round(total_today_impact)
+            round(total_today_impact),
 
     }
 
