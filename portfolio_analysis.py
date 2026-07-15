@@ -164,7 +164,7 @@ for item in results:
     }
 
 
-    return {
+return {
 
         "summary": summary,
 
