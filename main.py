@@ -3,11 +3,11 @@ from dotenv import load_dotenv
 import os
 import sys
 import json
-import traceback
 from market_data import get_market_data
 from news_data import get_market_news
 from portfolio_analysis import calculate_portfolio_impact
 from earnings_calendar import get_upcoming_earnings
+from utils import log_error
 
 from linebot.v3.messaging import (
     Configuration,
@@ -28,12 +28,15 @@ client = OpenAI(
 )
 
 
-def send_line_message(text):
+def send_line_message(text: str) -> bool:
     """
     LINEへメッセージを送信する。
 
     文字数が上限を超える場合は切り詰めて送信する。
-    送信に失敗した場合はFalseを返し、呼び出し側で異常終了を判断できるようにする。
+
+    Returns:
+        送信に成功した場合True、失敗した場合False。
+        呼び出し側はFalseの場合に異常終了させるかどうかを判断できる。
     """
     if len(text) > LINE_MAX_LENGTH:
         text = text[:LINE_MAX_LENGTH] + "\n\n…(文字数上限のため以降省略)"
@@ -59,8 +62,7 @@ def send_line_message(text):
         return True
 
     except Exception as e:
-        print(f"LINE送信失敗: {e}")
-        print(traceback.format_exc())
+        log_error("LINE送信失敗", e)
         return False
 
 
@@ -74,8 +76,7 @@ try:
         strategy = f.read()
 
 except Exception as e:
-    print(f"必須ファイルの読み込みに失敗: {e}")
-    print(traceback.format_exc())
+    log_error("必須ファイルの読み込みに失敗", e)
     send_line_message(
         "⚠️ EZE起動エラー\n\n"
         "portfolio.jsonまたはstrategy.txtの読み込みに失敗しました。\n\n"
@@ -87,10 +88,9 @@ except Exception as e:
 # 市場データ取得
 # 失敗してもレポート自体は継続させたいため、空データにフォールバックする
 try:
-    market_data = get_market_data()
+    market_data = get_market_data(portfolio)
 except Exception as e:
-    print(f"market_data取得失敗: {e}")
-    print(traceback.format_exc())
+    log_error("market_data取得失敗", e)
     market_data = {}
 
 print("JPY=X DATA")
@@ -101,8 +101,7 @@ print(market_data.get("JPY=X"))
 try:
     earnings = get_upcoming_earnings(portfolio)
 except Exception as e:
-    print(f"earnings取得失敗: {e}")
-    print(traceback.format_exc())
+    log_error("earnings取得失敗", e)
     earnings = []
 
 
@@ -113,8 +112,7 @@ try:
         market_data
     )
 except Exception as e:
-    print(f"portfolio_impact計算失敗: {e}")
-    print(traceback.format_exc())
+    log_error("portfolio_impact計算失敗", e)
     portfolio_impact = {
         "summary": {},
         "holdings": []
@@ -125,8 +123,7 @@ except Exception as e:
 try:
     news_data = get_market_news()
 except Exception as e:
-    print(f"news_data取得失敗: {e}")
-    print(traceback.format_exc())
+    log_error("news_data取得失敗", e)
     news_data = {}
 
 
@@ -421,8 +418,7 @@ try:
     message = response.output_text
 
 except Exception as e:
-    print(f"AI分析生成失敗: {e}")
-    print(traceback.format_exc())
+    log_error("AI分析生成失敗", e)
     message = (
         "⚠️ EZEレポート生成エラー\n\n"
         "本日のレポート作成中にAI分析でエラーが発生しました。\n"
