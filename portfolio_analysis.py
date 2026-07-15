@@ -5,7 +5,10 @@
 含み損益・前日比インパクトなどを計算する。
 """
 
+import math
 from typing import Any
+
+from utils import to_market_ticker
 
 # 集計対象外とする銘柄(投資信託・その他枠など、個別株として扱わないもの)
 EXCLUDED_TICKERS: set[str] = {
@@ -60,15 +63,27 @@ def calculate_portfolio_impact(
             print(f"average_priceが未設定のためスキップ: {ticker}")
             continue
 
-        if ticker not in market_data:
+        market_ticker = to_market_ticker(ticker)
+
+        if market_ticker not in market_data:
             continue
 
-        data = market_data[ticker]
+        data = market_data[market_ticker]
         if "price" not in data or "change_percent" not in data:
             continue
 
         current_price = data["price"]
         change = data["change_percent"]
+
+        # NaN対策: market_data側で弾き切れなかった欠損値がここに来ても
+        # round()でクラッシュしないよう、ここでも防御しておく
+        if not isinstance(current_price, (int, float)) or math.isnan(current_price):
+            print(f"株価が不正(NaN)のためスキップ: {ticker}")
+            continue
+
+        if not isinstance(change, (int, float)) or math.isnan(change):
+            print(f"前日比が不正(NaN)のためスキップ: {ticker}")
+            continue
 
         if item.get("currency") == "JPY":
             cost = shares * average_price
