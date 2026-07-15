@@ -42,8 +42,8 @@ EXCLUDED_TICKERS: set[str] = {
 }
 
 # yfinance/Yahoo側の一時的な取得失敗(NaN応答・データ不足を含む)に対するリトライ設定
-MAX_RETRIES = 2
-RETRY_DELAY_SECONDS = 3
+MAX_RETRIES = 3
+RETRY_DELAY_SECONDS = 5
 
 # 銘柄数が多いため、連続リクエストでYahoo側のレート制限を受けないよう
 # 1銘柄ごとに小休止を入れる
