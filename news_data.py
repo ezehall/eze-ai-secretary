@@ -50,7 +50,7 @@ def get_news(keyword: str, limit: int = 2) -> list[dict[str, Any]]:
         limit: 取得件数の上限
 
     Returns:
-        {"title": str, "date": str} の辞書のリスト。
+        {"title": str, "date": str, "url": str} の辞書のリスト。
         取得に失敗した場合は {"error": str} を1件含むリストを返す。
     """
     query = urllib.parse.quote(keyword)
@@ -72,10 +72,12 @@ def get_news(keyword: str, limit: int = 2) -> list[dict[str, Any]]:
         for item in root.findall(".//item")[:limit]:
             title = item.find("title")
             pub_date = item.find("pubDate")
+            link = item.find("link")
 
             news.append({
                 "title": title.text if title is not None else "タイトル不明",
                 "date": convert_japan_time(pub_date.text) if pub_date is not None else "日時不明",
+                "url": link.text if link is not None else None,
             })
 
         return news
