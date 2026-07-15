@@ -2,5 +2,6 @@ openai
 python-dotenv
 line-bot-sdk
 yfinance
+curl_cffi>=0.15
 requests
 pytz
