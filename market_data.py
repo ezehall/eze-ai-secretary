@@ -41,9 +41,17 @@ EXCLUDED_TICKERS: set[str] = {
     "AI_INDEX",
 }
 
-# yfinance/Yahoo側の一時的な取得失敗に対するリトライ設定
+# yfinance/Yahoo側の一時的な取得失敗(NaN応答・データ不足を含む)に対するリトライ設定
 MAX_RETRIES = 2
-RETRY_DELAY_SECONDS = 2
+RETRY_DELAY_SECONDS = 3
+
+# 銘柄数が多いため、連続リクエストでYahoo側のレート制限を受けないよう
+# 1銘柄ごとに小休止を入れる
+REQUEST_INTERVAL_SECONDS = 0.5
+
+# 取得期間。市場休場日や一時的な欠損があっても直近2営業日分の終値を
+# 拾えるよう、必要な2日分より広めに取得する
+HISTORY_PERIOD = "5d"
 
 
 def _build_ticker_map(portfolio: dict[str, Any]) -> dict[str, str]:
@@ -71,12 +79,43 @@ def _build_ticker_map(portfolio: dict[str, Any]) -> dict[str, str]:
     return tickers
 
 
+def _parse_price_history(ticker: str, data: Any) -> dict[str, float] | None:
+    """
+    yfinanceのhistory()結果から直近2営業日分の終値を取り出し、
+    価格と前日比を計算する。
+
+    データ不足・NaN・0除算などの不正なケースはすべてNoneとして扱い、
+    呼び出し側でリトライまたはスキップの判断ができるようにする。
+    """
+    if data is None or len(data) < 2:
+        print(f"データ不足: {ticker}")
+        return None
+
+    today_price = float(data["Close"].iloc[-1])
+    yesterday_price = float(data["Close"].iloc[-2])
+
+    if math.isnan(today_price) or math.isnan(yesterday_price) or yesterday_price == 0:
+        print(f"価格データが不正(NaNまたは0): {ticker}")
+        return None
+
+    change_percent = ((today_price - yesterday_price) / yesterday_price) * 100
+
+    if math.isnan(change_percent):
+        print(f"前日比の計算に失敗(NaN): {ticker}")
+        return None
+
+    return {
+        "price": round(today_price, 2),
+        "change_percent": round(change_percent, 2),
+    }
+
+
 def _fetch_ticker_data(ticker: str) -> dict[str, float] | None:
     """
     1銘柄分の価格データをyfinanceから取得する。
 
-    一時的な取得失敗(ネットワーク瞬断・Yahoo側のレート制限など)に備えて
-    数回リトライする。データが取れない、またはNaNを含む場合はNoneを返す。
+    通信エラーだけでなく、NaN・データ不足で返ってきた場合も
+    Yahoo側の一時的な問題である可能性が高いため、同様にリトライする。
 
     Returns:
         {"price": float, "change_percent": float} または取得不能ならNone
@@ -85,38 +124,21 @@ def _fetch_ticker_data(ticker: str) -> dict[str, float] | None:
 
     for attempt in range(MAX_RETRIES + 1):
         try:
-            data = yf.Ticker(ticker).history(period="2d")
+            data = yf.Ticker(ticker).history(period=HISTORY_PERIOD)
+            result = _parse_price_history(ticker, data)
 
-            if len(data) < 2:
-                print(f"データ不足: {ticker}")
-                return None
-
-            today_price = float(data["Close"].iloc[-1])
-            yesterday_price = float(data["Close"].iloc[-2])
-
-            # NaN対策: 取得はできたが値が欠損しているケースを弾く
-            if math.isnan(today_price) or math.isnan(yesterday_price) or yesterday_price == 0:
-                print(f"価格データが不正(NaNまたは0): {ticker}")
-                return None
-
-            change_percent = ((today_price - yesterday_price) / yesterday_price) * 100
-
-            if math.isnan(change_percent):
-                print(f"前日比の計算に失敗(NaN): {ticker}")
-                return None
-
-            return {
-                "price": round(today_price, 2),
-                "change_percent": round(change_percent, 2),
-            }
+            if result is not None:
+                return result
 
         except Exception as e:
             last_error = e
-            if attempt < MAX_RETRIES:
-                time.sleep(RETRY_DELAY_SECONDS)
-                continue
 
-    print(f"取得失敗: {ticker} / {last_error}")
+        if attempt < MAX_RETRIES:
+            time.sleep(RETRY_DELAY_SECONDS)
+
+    if last_error is not None:
+        print(f"取得失敗: {ticker} / {last_error}")
+
     return None
 
 
@@ -142,12 +164,13 @@ def get_market_data(portfolio: dict[str, Any]) -> dict[str, dict[str, Any]]:
     for name, ticker in tickers.items():
         price_data = _fetch_ticker_data(ticker)
 
-        if price_data is None:
-            continue
+        if price_data is not None:
+            result[ticker] = {
+                "name": name,
+                **price_data,
+            }
 
-        result[ticker] = {
-            "name": name,
-            **price_data,
-        }
+        # Yahoo側への連続アクセスを避けるための小休止
+        time.sleep(REQUEST_INTERVAL_SECONDS)
 
     return result
