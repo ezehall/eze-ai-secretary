@@ -60,4 +60,30 @@ jobs:
           else
             git commit -m "chore: update asset history and portfolio data"
             git push
+          fi          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+        run: |
+          python main.py
+
+      # main.pyがLINE送信失敗などでエラー終了した場合でも、
+      # 資産推移ログや売買履歴の反映結果は失わずコミットしておきたいため
+      # if: always() で必ず実行する
+      - name: Commit updated data files
+        if: always()
+        run: |
+          git config user.name "eze-bot"
+          git config user.email "eze-bot@users.noreply.github.com"
+
+          for f in asset_history.json portfolio.json trade_history.json; do
+            if [ -f "$f" ]; then
+              git add "$f"
+            fi
+          done
+
+          if git diff --cached --quiet; then
+            echo "変更なし。コミットをスキップします。"
+          else
+            git commit -m "chore: update asset history and portfolio data"
+            git push
           fi
