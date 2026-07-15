@@ -5,3 +5,4 @@ yfinance
 curl_cffi>=0.15
 requests
 pytz
+pandas
