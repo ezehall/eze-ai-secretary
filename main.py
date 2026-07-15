@@ -276,32 +276,28 @@ AI
 
 【8. 今日の資産影響】
 
-必ずportfolio_impact.summaryのみ使用。
+必ずportfolio_impactの数値のみを使用してください。
 
-GPT独自計算は禁止。
-
-表示：
+表示内容
 
 ・現在の評価額合計
 ・取得額合計
 ・含み損益（円・％）
 ・前日比（金額）
+・プラス寄与TOP3
+・マイナス寄与TOP3
 
-さらに、
-
-プラス寄与TOP3
-マイナス寄与TOP3
-
-を表示。
-
-使用可能データ：
+現在の評価額や含み損益は推測せず、
+portfolio_impactに含まれる
 
 market_value_yen
 cost_yen
 unrealized_yen
 today_impact_yen
 
-のみ。
+を合計して算出してください。
+
+存在しない銘柄や推測は禁止します。
 
 
 【9. 決算予定】
