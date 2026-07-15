@@ -112,8 +112,18 @@ def _parse_price_history(ticker: str, data: Any) -> dict[str, float] | None:
         _describe_failure(ticker, data)
         return None
 
-    today_price = float(data["Close"].iloc[-1])
-    yesterday_price = float(data["Close"].iloc[-2])
+    # 実行タイミングによっては、当日分の終値がYahoo側でまだ確定・公開されておらず
+    # 最新行がNaNになっていることがある(リトライしても解消しない)。
+    # そのため直近2営業日を見る前に、未確定行を除外しておく。
+    closes = data["Close"].dropna()
+
+    if len(closes) < 2:
+        print(f"データ不足(有効な終値が2日分未満): {ticker}")
+        _describe_failure(ticker, data)
+        return None
+
+    today_price = float(closes.iloc[-1])
+    yesterday_price = float(closes.iloc[-2])
 
     if math.isnan(today_price) or math.isnan(yesterday_price) or yesterday_price == 0:
         print(f"価格データが不正(NaNまたは0): {ticker}")
