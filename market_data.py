@@ -79,6 +79,26 @@ def _build_ticker_map(portfolio: dict[str, Any]) -> dict[str, str]:
     return tickers
 
 
+def _describe_failure(ticker: str, data: Any) -> None:
+    """
+    取得失敗時に、Yahooから実際にどんなデータが返ってきたのかを
+    GitHub Actionsのログに出力する。原因調査用の診断情報であり、
+    処理のフロー自体には影響しない。
+    """
+    if data is None:
+        print(f"[診断] {ticker}: dataがNoneでした")
+        return
+
+    try:
+        print(f"[診断] {ticker}: 行数={len(data)}, 空データ={data.empty}")
+        if not data.empty and "Close" in data.columns:
+            print(f"[診断] {ticker}: Close列の内容 =\n{data['Close'].to_string()}")
+        else:
+            print(f"[診断] {ticker}: 列一覧={list(data.columns)}")
+    except Exception as e:
+        print(f"[診断] {ticker}: 診断情報の出力自体に失敗しました({e})")
+
+
 def _parse_price_history(ticker: str, data: Any) -> dict[str, float] | None:
     """
     yfinanceのhistory()結果から直近2営業日分の終値を取り出し、
@@ -89,6 +109,7 @@ def _parse_price_history(ticker: str, data: Any) -> dict[str, float] | None:
     """
     if data is None or len(data) < 2:
         print(f"データ不足: {ticker}")
+        _describe_failure(ticker, data)
         return None
 
     today_price = float(data["Close"].iloc[-1])
@@ -96,12 +117,14 @@ def _parse_price_history(ticker: str, data: Any) -> dict[str, float] | None:
 
     if math.isnan(today_price) or math.isnan(yesterday_price) or yesterday_price == 0:
         print(f"価格データが不正(NaNまたは0): {ticker}")
+        _describe_failure(ticker, data)
         return None
 
     change_percent = ((today_price - yesterday_price) / yesterday_price) * 100
 
     if math.isnan(change_percent):
         print(f"前日比の計算に失敗(NaN): {ticker}")
+        _describe_failure(ticker, data)
         return None
 
     return {
