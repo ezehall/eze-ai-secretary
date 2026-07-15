@@ -119,6 +119,7 @@ def calculate_portfolio_impact(portfolio, market_data):
             "today_change_percent": change,
 
             "today_impact_yen": round(today_impact)
+            "portfolio_ratio": 0
 
         })
 
@@ -128,7 +129,13 @@ def calculate_portfolio_impact(portfolio, market_data):
         key=lambda x: x["today_impact_yen"],
         reverse=True
     )
+for item in results:
 
+    item["portfolio_ratio"] = round(
+        item["market_value_yen"]
+        / total_market_value * 100,
+        2
+        )
 
     summary = {
 
