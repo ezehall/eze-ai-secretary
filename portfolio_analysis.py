@@ -118,7 +118,7 @@ def calculate_portfolio_impact(portfolio, market_data):
 
             "today_change_percent": change,
 
-            "today_impact_yen": round(today_impact)
+            "today_impact_yen": round(today_impact),
             "portfolio_ratio": 0
 
         })
