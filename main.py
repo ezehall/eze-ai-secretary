@@ -7,6 +7,7 @@ from market_data import get_market_data
 from news_data import get_market_news
 from portfolio_analysis import calculate_portfolio_impact
 from portfolio_insights import calculate_theme_allocation, detect_concentration_risks
+from valuation_data import get_valuation_data
 from earnings_calendar import get_upcoming_earnings
 from utils import log_error
 
@@ -131,6 +132,15 @@ except Exception as e:
     concentration_risks = []
 
 
+# バリュエーションデータ(PER・PBR・PEG等)の取得(Phase2)
+# 失敗時は空リストで継続する(割高・割安判断が定性コメントのみになる)
+try:
+    valuation_data = get_valuation_data(portfolio)
+except Exception as e:
+    log_error("valuation_data取得失敗", e)
+    valuation_data = []
+
+
 # ニュースデータ取得(失敗時は空データで継続)
 try:
     news_data = get_market_news()
@@ -174,6 +184,13 @@ days_untilとpre_earnings_alertはPython側で確定計算済みなので、
 
 {json.dumps(concentration_risks, ensure_ascii=False, indent=2)}
 
+以下がFMP APIから取得した評価指標(PER・PBR・PEG・PSR、いずれも直近12ヶ月ベース)です。
+値がnullの項目はデータが取得できなかったことを意味するので、その項目については
+「データなし」として扱い、憶測で数値を補わないでください。この数値はそのまま使い、
+自分でPER等を計算し直さないでください。
+
+{json.dumps(valuation_data, ensure_ascii=False, indent=2)}
+
 あなたは私専用の投資秘書「EZE」です。
 
 目的：
@@ -190,8 +207,15 @@ days_untilとpre_earnings_alertはPython側で確定計算済みなので、
 ・比率や金額などの数値はPythonが計算した値のみを使い、自分で計算し直さない。
 ・portfolio.jsonに存在しない銘柄は保有銘柄として扱わない。
 ・sharesが0の銘柄は保有銘柄として表示しない。
-・GOOGとGOOGLは別銘柄として保有しているため、両方表示してよい。
+・GOOGとGOOGLは別銘柄として保有しているため、両方表示してよい。ただし同一発行体(Alphabet)の
+  異なる株式クラスであるため、【3. 投資アクション】でGOOGとGOOGLの方向性(買い増し/ホールド/利確/
+  停止)が互いに矛盾しないようにすること。保有比率や取得単価の違いにより結論が異なる場合は、
+  その理由を理由欄に明記すること。
 ・IONLは現在shares=0のため、保有銘柄分析には表示しない。
+・各セクションの指示文(「〇行以内」「重要な銘柄のみ表示」等の条件説明や見出しの注釈)は、
+  出力に一切含めない。指示に従った結果のみを書くこと。
+・Pythonから渡されたデータ(集中投資リスクなど)をリストのまま(例: ["...", "..."])貼り付けない。
+  自然な日本語の箇条書き(・から始まる行)に整形してから表示すること。
 
 
 ━━━━━━━━━━
@@ -295,11 +319,20 @@ portfolio.jsonに存在する保有銘柄のみ対象。
 形式：テーマ名：比率%(評価額)
 
 ■ 集中投資リスク
-上記の集中投資リスクデータをそのまま表示。空リストの場合は「特になし」と表示。
+上記の集中投資リスクデータの各項目を「・」で始まる箇条書きに変換して表示すること
+(リストの角括弧やダブルクォートをそのまま出力しない)。
+データが空リストの場合は「・特になし」と1行だけ表示。
+
+■ 割高・割安分析
+上記の評価指標データ(valuation_data)をもとに、主要な保有銘柄についてPER・PEGレシオを
+中心に割高感・割安感を短く述べる。数値が「データなし」の銘柄は無理に評価しない。
+形式：
+銘柄：PER〇倍(データなしの場合は省略)／所見(1行)
+最大5銘柄程度に絞り、羅列しすぎない。
 
 ■ EZEの所見(4行以内)
 保有銘柄全体を俯瞰した所見をまとめる。含める観点：
-・全体として割高/割安と感じる部分があるか
+・ポートフォリオ全体として割高/割安に偏っている傾向があるか(上記の評価指標を踏まえる)
 ・長期成長性の観点でポートフォリオ全体はどう評価できるか
 ・リバランスやポートフォリオ改善の方向性があれば一言
 個別銘柄の説明を繰り返さず、あくまでポートフォリオ全体の視点で書くこと。
@@ -360,11 +393,16 @@ today_impact_yen
 
 ない場合は項目自体を省略。
 
-pre_earnings_alertがtrueの銘柄には⚠️を先頭に付けて強調する。
+表示形式は以下を厳守する。「銘柄：」の行は常にこの形式で書き、
+pre_earnings_alertがtrueの場合のみ銘柄名の直後に半角スペースと⚠️を付ける
+(falseの場合は⚠️を付けず、括弧などの余分な記号も付けない)。
+
+例(アラートあり)：銘柄：TSM ⚠️
+例(アラートなし)：銘柄：PLTR
 
 表示：
 
-（⚠️）銘柄：
+銘柄：
 決算発表日：
 決算まであと何日：(days_untilの値をそのまま使う)
 重要度：
