@@ -1,7 +1,9 @@
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+import sys
 import json
+import traceback
 from market_data import get_market_data
 from news_data import get_market_news
 from portfolio_analysis import calculate_portfolio_impact
@@ -17,34 +19,116 @@ from linebot.v3.messaging import (
 
 load_dotenv()
 
+# LINEの1メッセージあたりの文字数上限(5000)に余裕を持たせた安全値
+LINE_MAX_LENGTH = 4900
+
 # OpenAI設定
 client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
-# ポートフォリオ読み込み
-with open("portfolio.json", "r", encoding="utf-8") as f:
-    portfolio = json.load(f)
-    
+
+def send_line_message(text):
+    """
+    LINEへメッセージを送信する。
+
+    文字数が上限を超える場合は切り詰めて送信する。
+    送信に失敗した場合はFalseを返し、呼び出し側で異常終了を判断できるようにする。
+    """
+    if len(text) > LINE_MAX_LENGTH:
+        text = text[:LINE_MAX_LENGTH] + "\n\n…(文字数上限のため以降省略)"
+
+    try:
+        configuration = Configuration(
+            access_token=os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
+        )
+
+        with ApiClient(configuration) as api_client:
+            line_api = MessagingApi(api_client)
+
+            line_api.push_message(
+                PushMessageRequest(
+                    to=os.getenv("LINE_USER_ID"),
+                    messages=[
+                        TextMessage(text=text)
+                    ]
+                )
+            )
+
+        print("LINE送信完了")
+        return True
+
+    except Exception as e:
+        print(f"LINE送信失敗: {e}")
+        print(traceback.format_exc())
+        return False
+
+
+# ポートフォリオ・投資方針の読み込み
+# これらは必須データのため、失敗した場合はエラーをLINEに通知して処理を停止する
+try:
+    with open("portfolio.json", "r", encoding="utf-8") as f:
+        portfolio = json.load(f)
+
+    with open("strategy.txt", "r", encoding="utf-8") as f:
+        strategy = f.read()
+
+except Exception as e:
+    print(f"必須ファイルの読み込みに失敗: {e}")
+    print(traceback.format_exc())
+    send_line_message(
+        "⚠️ EZE起動エラー\n\n"
+        "portfolio.jsonまたはstrategy.txtの読み込みに失敗しました。\n\n"
+        f"エラー内容: {e}"
+    )
+    sys.exit(1)
+
+
 # 市場データ取得
-market_data = get_market_data()
+# 失敗してもレポート自体は継続させたいため、空データにフォールバックする
+try:
+    market_data = get_market_data()
+except Exception as e:
+    print(f"market_data取得失敗: {e}")
+    print(traceback.format_exc())
+    market_data = {}
 
 print("JPY=X DATA")
-print(market_data.get("JPY=X")) 
+print(market_data.get("JPY=X"))
 
-earnings = get_upcoming_earnings(portfolio)
 
-portfolio_impact = calculate_portfolio_impact(
-    portfolio,
-    market_data
-)
+# 決算予定取得(失敗時は空リストで継続)
+try:
+    earnings = get_upcoming_earnings(portfolio)
+except Exception as e:
+    print(f"earnings取得失敗: {e}")
+    print(traceback.format_exc())
+    earnings = []
 
-# ニュースデータ取得
-news_data = get_market_news()
 
-# 投資方針読み込み
-with open("strategy.txt", "r", encoding="utf-8") as f:
-    strategy = f.read()    
+# ポートフォリオ影響計算(失敗時は空の集計結果で継続)
+try:
+    portfolio_impact = calculate_portfolio_impact(
+        portfolio,
+        market_data
+    )
+except Exception as e:
+    print(f"portfolio_impact計算失敗: {e}")
+    print(traceback.format_exc())
+    portfolio_impact = {
+        "summary": {},
+        "holdings": []
+    }
+
+
+# ニュースデータ取得(失敗時は空データで継続)
+try:
+    news_data = get_market_news()
+except Exception as e:
+    print(f"news_data取得失敗: {e}")
+    print(traceback.format_exc())
+    news_data = {}
+
 
 # EZEへの指示
 prompt = f"""
@@ -327,31 +411,31 @@ today_impact_yen
 """
 
 # AI分析生成
-response = client.responses.create(
-    model="gpt-5-nano",
-    input=prompt
-)
+# ここが失敗すると本来レポートが1通も届かなくなるため、
+# 失敗時はエラー内容そのものをLINEに送ることで「今日は失敗した」と分かるようにする
+try:
+    response = client.responses.create(
+        model="gpt-5-nano",
+        input=prompt
+    )
+    message = response.output_text
 
-message = response.output_text
+except Exception as e:
+    print(f"AI分析生成失敗: {e}")
+    print(traceback.format_exc())
+    message = (
+        "⚠️ EZEレポート生成エラー\n\n"
+        "本日のレポート作成中にAI分析でエラーが発生しました。\n"
+        f"エラー内容: {e}\n\n"
+        "データ取得自体は成功している可能性があります。"
+        "GitHub Actionsのログを確認してください。"
+    )
 
 print(message)
 
 
 # LINE送信
-configuration = Configuration(
-    access_token=os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
-)
-
-with ApiClient(configuration) as api_client:
-    line_api = MessagingApi(api_client)
-
-    line_api.push_message(
-        PushMessageRequest(
-            to=os.getenv("LINE_USER_ID"),
-            messages=[
-                TextMessage(text=message)
-            ]
-        )
-    )
-
-print("LINE送信完了")
+# 送信に失敗した場合はGitHub Actions側で失敗として検知できるよう
+# 終了コード1で終了する(Actionsの実行履歴が赤くなり気づける)
+if not send_line_message(message):
+    sys.exit(1)
