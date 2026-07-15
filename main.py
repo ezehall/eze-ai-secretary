@@ -8,7 +8,10 @@ from news_data import get_market_news
 from portfolio_analysis import calculate_portfolio_impact
 from portfolio_insights import calculate_theme_allocation, detect_concentration_risks
 from valuation_data import get_valuation_data
-from earnings_calendar import get_upcoming_earnings
+from earnings_calendar import get_upcoming_earnings, get_recent_earnings_results
+from trade_processor import load_trade_history, apply_trades
+from asset_history import append_daily_snapshot
+from risk_analytics import calculate_volatility, calculate_correlation
 from utils import log_error
 
 from linebot.v3.messaging import (
@@ -87,6 +90,28 @@ except Exception as e:
     sys.exit(1)
 
 
+# 売買履歴の反映(Phase3)
+# trade_history.json内の未反映(applied=false)の売買をportfolio.jsonへ反映する。
+# ファイルが存在しない場合は何もしない(未導入でも動作する)。
+# ここで反映しておくことで、本日のレポートにも更新後の保有状況が使われる。
+trade_errors: list[str] = []
+try:
+    trades = load_trade_history()
+    portfolio, trades, trade_errors, trades_changed = apply_trades(portfolio, trades)
+
+    if trades_changed:
+        with open("portfolio.json", "w", encoding="utf-8") as f:
+            json.dump(portfolio, f, ensure_ascii=False, indent=2)
+
+        with open("trade_history.json", "w", encoding="utf-8") as f:
+            json.dump(trades, f, ensure_ascii=False, indent=2)
+
+        print(f"売買履歴を反映しました({sum(1 for t in trades if t.get('applied'))}件適用済み)")
+
+except Exception as e:
+    log_error("売買履歴の反映処理に失敗", e)
+
+
 # 市場データ取得
 # 失敗してもレポート自体は継続させたいため、空データにフォールバックする
 try:
@@ -105,6 +130,14 @@ try:
 except Exception as e:
     log_error("earnings取得失敗", e)
     earnings = []
+
+
+# 直近決算の実績振り返り取得(失敗時は空リストで継続)
+try:
+    recent_earnings_results = get_recent_earnings_results(portfolio)
+except Exception as e:
+    log_error("recent_earnings_results取得失敗", e)
+    recent_earnings_results = []
 
 
 # ポートフォリオ影響計算(失敗時は空の集計結果で継続)
@@ -141,6 +174,28 @@ except Exception as e:
     valuation_data = []
 
 
+# 資産推移ログの記録(基盤系)
+# 失敗してもレポート自体には影響させない(ログ記録の失敗でレポートが
+# 届かなくなるのは本末転倒なため)
+try:
+    asset_history = append_daily_snapshot(portfolio_impact)
+except Exception as e:
+    log_error("資産推移ログの記録に失敗", e)
+    asset_history = []
+
+
+# ボラティリティ・相関分析(Phase2積み残し)
+# asset_history.jsonの蓄積日数が少ないうちはavailable=Falseとなり、
+# AIには「データ蓄積中」であることをそのまま伝える
+try:
+    volatility_data = calculate_volatility(asset_history)
+    correlation_data = calculate_correlation(asset_history)
+except Exception as e:
+    log_error("リスク分析(ボラティリティ・相関)計算失敗", e)
+    volatility_data = {"available": False, "data_points": 0, "volatility": []}
+    correlation_data = {"available": False, "data_points": 0, "top_pairs": []}
+
+
 # ニュースデータ取得(失敗時は空データで継続)
 try:
     news_data = get_market_news()
@@ -171,6 +226,12 @@ days_untilとpre_earnings_alertはPython側で確定計算済みなので、
 
 {json.dumps(earnings, ensure_ascii=False, indent=2)}
 
+以下が直近{3}日以内に発表された保有銘柄の決算実績(市場予想との比較)です。
+まだ実績が発表されていない銘柄はここには含まれません。空リストの場合は
+直近の決算発表が無かったことを意味します。
+
+{json.dumps(recent_earnings_results, ensure_ascii=False, indent=2)}
+
 以下がPythonで計算したポートフォリオ影響データです。
 
 {json.dumps(portfolio_impact, ensure_ascii=False, indent=2)}
@@ -190,6 +251,18 @@ days_untilとpre_earnings_alertはPython側で確定計算済みなので、
 自分でPER等を計算し直さないでください。
 
 {json.dumps(valuation_data, ensure_ascii=False, indent=2)}
+
+以下がPythonで計算したボラティリティ(値動きの標準偏差)データです。
+availableがfalseの場合はデータ蓄積中のため、無理に分析コメントを書かず、
+「データ蓄積中(現在data_points日分/required_data_points日分必要)」と
+一言添えるだけにしてください。
+
+{json.dumps(volatility_data, ensure_ascii=False, indent=2)}
+
+以下がPythonで計算した銘柄間の相関データ(相関が高いペア上位)です。
+availableがfalseの場合の扱いはボラティリティと同様です。
+
+{json.dumps(correlation_data, ensure_ascii=False, indent=2)}
 
 あなたは私専用の投資秘書「EZE」です。
 
@@ -330,6 +403,11 @@ portfolio.jsonに存在する保有銘柄のみ対象。
 銘柄：PER〇倍(データなしの場合は省略)／所見(1行)
 最大5銘柄程度に絞り、羅列しすぎない。
 
+■ ボラティリティ・相関
+volatility_data・correlation_dataがavailable=trueの場合のみ、ボラティリティが高い上位2〜3銘柄と、
+相関が高い(または低い)銘柄ペアを1〜2行で述べる。availableがfalseの場合は
+「データ蓄積中(あとX日分)」とだけ書き、それ以上の考察はしない。
+
 ■ EZEの所見(4行以内)
 保有銘柄全体を俯瞰した所見をまとめる。含める観点：
 ・ポートフォリオ全体として割高/割安に偏っている傾向があるか(上記の評価指標を踏まえる)
@@ -390,6 +468,7 @@ today_impact_yen
 
 【7. 決算予定】
 
+■ 決算予定
 決算予定がある銘柄のみ表示。
 
 ない場合は項目自体を省略。
@@ -410,6 +489,15 @@ pre_earnings_alertがtrueの場合のみ銘柄名の直後に半角スペース�
 市場予想：
 投資判断への影響：
 決算で確認すべきポイント：
+
+■ 直近決算の振り返り
+recent_earnings_resultsが空リストの場合はこのサブセクション自体を省略する。
+データがある場合、各銘柄について以下を表示する。
+
+銘柄：
+予想EPS/実績EPS：
+サプライズ：(eps_surprise_percentを%表示。ポジティブなら上振れ、ネガティブなら下振れと分かる書き方)
+決算後の想定リスク：(サプライズの大小を踏まえ、株価への影響や注視点を2行以内で)
 
 
 注意：
@@ -442,6 +530,18 @@ except Exception as e:
     )
 
 print(message)
+
+# 売買履歴の反映でエラーがあった場合、AIの出力に頼らずPython側で
+# 確実にメッセージ先頭へ警告を追加する(該当分はtrade_history.json上で
+# 未反映のままなので、内容を修正すれば次回以降に再度反映を試みる)
+if trade_errors:
+    warning_lines = "\n".join(f"・{e}" for e in trade_errors)
+    message = (
+        "⚠️ 売買履歴の反映で問題がありました(該当分は未反映です。"
+        "trade_history.jsonの内容を修正してください)\n"
+        f"{warning_lines}\n\n"
+        "━━━━━━━━━━\n\n"
+    ) + message
 
 
 # LINE送信
