@@ -6,7 +6,7 @@ on:
   # そのため実行時刻を:17にずらして混雑を避けている。
   # 23:15 UTC = 日本時間 07:17
   schedule:
-    - cron: "17 22 * * *"
+    - cron: "15 23 * * *"
   workflow_dispatch:
 
 # asset_history.json・portfolio.json・trade_history.jsonへの変更を
