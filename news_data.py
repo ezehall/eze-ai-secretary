@@ -108,6 +108,9 @@ def get_news(keyword: str, limit: int = 2) -> list[dict[str, Any]]:
                 "url": _shorten_url(link.text) if link is not None else None,
             })
 
+        url_count = sum(1 for n in news if n.get("url"))
+        print(f"[診断] ニュース取得: '{keyword}' → {len(news)}件中 URL取得成功 {url_count}件")
+
         return news
 
     except Exception as e:
