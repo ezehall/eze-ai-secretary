@@ -245,9 +245,9 @@ days_untilとpre_earnings_alertはPython側で確定計算済みなので、
 
 {json.dumps(concentration_risks, ensure_ascii=False, indent=2)}
 
-以下がFMP APIから取得した評価指標(PER・PBR・PEG・PSR、いずれも直近12ヶ月ベース)です。
-値がnullの項目はデータが取得できなかったことを意味するので、その項目については
-「データなし」として扱い、憶測で数値を補わないでください。この数値はそのまま使い、
+以下がFMP APIから取得した評価指標です。無料プランの制約上、現状PERのみ取得可能で、
+PBR・PEG・PSRは常にnullになります(nullの項目は「データなし」として扱ってください)。
+値がnullの項目は憶測で数値を補わないでください。この数値はそのまま使い、
 自分でPER等を計算し直さないでください。
 
 {json.dumps(valuation_data, ensure_ascii=False, indent=2)}
@@ -395,9 +395,9 @@ S&P500・NASDAQ・Dow Jones・VIX・米10年債・ドル円について、下記
 「・特になし」と1行だけ書く。
 
 ■ 割高・割安分析
-評価指標データ(valuation_data)をもとに、主要な保有銘柄についてPER・PEGレシオを
-中心に割高感・割安感を短く述べる。数値が「データなし」の銘柄は無理に評価しない。
-最大5銘柄程度に絞る。
+評価指標データ(valuation_data)をもとに、主要な保有銘柄についてPERを中心に
+割高感・割安感を短く述べる(PEGは現状データが無いため使わない)。
+pe_ratioが「データなし」の銘柄は無理に評価しない。最大5銘柄程度に絞る。
 
 ■ ボラティリティ・相関
 volatility_data・correlation_dataがavailable=trueの場合のみ、ボラティリティが高い

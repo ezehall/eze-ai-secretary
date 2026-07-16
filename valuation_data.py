@@ -1,9 +1,16 @@
 """
 バリュエーションデータ取得モジュール(Phase2)。
 
-Financial Modeling Prep (FMP) APIを使い、保有銘柄のPER・PBR・PEGレシオなど
-直近12ヶ月(TTM)ベースの評価指標を取得する。
+Financial Modeling Prep (FMP) APIのStock Quoteエンドポイントを使い、
+保有銘柄のPER(株価収益率)を取得する。
 決算カレンダー(earnings_calendar.py)と同じFMP_API_KEYを利用する。
+
+注意: 当初はTTM Ratios API(/stable/ratios-ttm)を使う設計だったが、
+これは有料プラン限定のエンドポイントであり、無料プランでは
+402 Payment Requiredエラーになることが判明した。
+そのため無料プランでも利用できるStock Quote API(/stable/quote)に
+切り替えている。このエンドポイントはPERのみを含み、PBR・PEG・PSRは
+含まれないため、それらの項目は常にNoneになる。
 
 割高・割安の最終判断はAI側の定性判断に委ねるが、根拠となる数値は
 ここで確定させ、AIに数値を推測させないようにする。
@@ -32,15 +39,19 @@ EXCLUDED_TICKERS: set[str] = {
 }
 
 
-def _fetch_ratios_ttm(ticker: str, api_key: str) -> dict[str, Any] | None:
+def _fetch_quote(ticker: str, api_key: str) -> dict[str, Any] | None:
     """
-    1銘柄分の直近12ヶ月(TTM)ベース評価指標を取得する。
+    1銘柄分の株価クオートを取得し、PERを取り出す。
+
+    FMPのレスポンス上のPERの項目名はドキュメント上「pe」だが、
+    バージョンによって表記が異なる可能性があるため、複数の
+    候補キーを順に確認する。
 
     Returns:
         評価指標の辞書。取得できなかった場合はNone。
     """
     url = (
-        "https://financialmodelingprep.com/stable/ratios-ttm"
+        "https://financialmodelingprep.com/stable/quote"
         f"?symbol={ticker}&apikey={api_key}"
     )
 
@@ -59,24 +70,31 @@ def _fetch_ratios_ttm(ticker: str, api_key: str) -> dict[str, Any] | None:
 
     entry = data[0]
 
+    pe_ratio = entry.get("pe")
+    if pe_ratio is None:
+        pe_ratio = entry.get("peRatio")
+
     return {
         "ticker": ticker,
-        "pe_ratio": entry.get("priceToEarningsRatioTTM"),
-        "pb_ratio": entry.get("priceToBookRatioTTM"),
-        "peg_ratio": entry.get("priceToEarningsGrowthRatioTTM"),
-        "ps_ratio": entry.get("priceToSalesRatioTTM"),
+        "pe_ratio": pe_ratio,
+        "eps": entry.get("eps"),
+        # Stock Quote APIには含まれないため常にNone。
+        # 将来的に有料プランへ移行する場合はratios-ttm等に切り替えて埋める。
+        "pb_ratio": None,
+        "peg_ratio": None,
+        "ps_ratio": None,
     }
 
 
 def get_valuation_data(portfolio: dict[str, Any]) -> list[dict[str, Any]]:
     """
-    保有銘柄のPER・PBR・PEG・PSRのTTMベース評価指標を取得する。
+    保有銘柄のPERを取得する(無料プランの制約上、PBR・PEG・PSRは常にNone)。
 
     Args:
         portfolio: portfolio.jsonの内容
 
     Returns:
-        {"ticker", "pe_ratio", "pb_ratio", "peg_ratio", "ps_ratio"} の
+        {"ticker", "pe_ratio", "eps", "pb_ratio", "peg_ratio", "ps_ratio"} の
         辞書のリスト。値が取得できなかった項目はNoneになる。
         APIキー未設定時は空リストを返す。個別銘柄の取得失敗は
         その銘柄をスキップするだけで、全体は失敗させない。
@@ -98,7 +116,7 @@ def get_valuation_data(portfolio: dict[str, Any]) -> list[dict[str, Any]]:
     results: list[dict[str, Any]] = []
 
     for ticker in tickers:
-        data = _fetch_ratios_ttm(ticker, api_key)
+        data = _fetch_quote(ticker, api_key)
 
         if data is not None:
             results.append(data)
