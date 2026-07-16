@@ -13,6 +13,7 @@ from typing import Any
 import pytz
 
 REQUEST_TIMEOUT_SECONDS = 10
+SHORTEN_TIMEOUT_SECONDS = 5
 USER_AGENT = "Mozilla/5.0 (compatible; EZE-Investment-Secretary/1.0)"
 
 # カテゴリ名: 検索キーワード
@@ -22,6 +23,33 @@ NEWS_TARGETS: dict[str, str] = {
     "米国市場": "US stock market Federal Reserve",
     "金利": "US Treasury yield Federal Reserve",
 }
+
+
+def _shorten_url(url: str | None) -> str | None:
+    """
+    TinyURL(APIキー不要)でURLを短縮する。
+
+    Google News RSSのリンクはリダイレクト用の非常に長いURLのため、
+    LINEで読みやすいよう短縮する。失敗した場合は元のURLをそのまま返す
+    (短縮できないだけで、ニュース自体の表示は妨げない)。
+    """
+    if not url:
+        return url
+
+    try:
+        endpoint = "https://tinyurl.com/api-create.php?url=" + urllib.parse.quote(url, safe="")
+        request = urllib.request.Request(endpoint, headers={"User-Agent": USER_AGENT})
+
+        with urllib.request.urlopen(request, timeout=SHORTEN_TIMEOUT_SECONDS) as response:
+            shortened = response.read().decode("utf-8").strip()
+
+        if shortened.startswith("http"):
+            return shortened
+
+    except Exception as e:
+        print(f"URL短縮に失敗、元のURLを使用します: {e}")
+
+    return url
 
 
 def convert_japan_time(date_string: str) -> str:
@@ -77,7 +105,7 @@ def get_news(keyword: str, limit: int = 2) -> list[dict[str, Any]]:
             news.append({
                 "title": title.text if title is not None else "タイトル不明",
                 "date": convert_japan_time(pub_date.text) if pub_date is not None else "日時不明",
-                "url": link.text if link is not None else None,
+                "url": _shorten_url(link.text) if link is not None else None,
             })
 
         return news
