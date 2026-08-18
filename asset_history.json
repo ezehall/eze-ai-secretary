@@ -3100,5 +3100,99 @@
         "today_change_percent": -2.87
       }
     ]
+  },
+  {
+    "date": "2026-08-19",
+    "total_market_value_yen": 4338843,
+    "total_cost_yen": 4169709,
+    "total_unrealized_yen": 169134,
+    "total_unrealized_percent": 4.06,
+    "holdings": [
+      {
+        "ticker": "GOOGL",
+        "market_value_yen": 54924,
+        "today_change_percent": 0.06
+      },
+      {
+        "ticker": "GOOG",
+        "market_value_yen": 54458,
+        "today_change_percent": -0.05
+      },
+      {
+        "ticker": "PLTR",
+        "market_value_yen": 82118,
+        "today_change_percent": -0.59
+      },
+      {
+        "ticker": "SPCX",
+        "market_value_yen": 68618,
+        "today_change_percent": -1.98
+      },
+      {
+        "ticker": "7272",
+        "market_value_yen": 191850,
+        "today_change_percent": -0.93
+      },
+      {
+        "ticker": "QMCO",
+        "market_value_yen": 56296,
+        "today_change_percent": -5.62
+      },
+      {
+        "ticker": "AVGO",
+        "market_value_yen": 121273,
+        "today_change_percent": -3.17
+      },
+      {
+        "ticker": "TSM",
+        "market_value_yen": 197904,
+        "today_change_percent": -4.07
+      },
+      {
+        "ticker": "NVDA",
+        "market_value_yen": 385703,
+        "today_change_percent": -2.34
+      },
+      {
+        "ticker": "OKLO",
+        "market_value_yen": 158396,
+        "today_change_percent": -5.74
+      },
+      {
+        "ticker": "MU",
+        "market_value_yen": 150117,
+        "today_change_percent": -7.02
+      },
+      {
+        "ticker": "QUBT",
+        "market_value_yen": 197133,
+        "today_change_percent": -5.86
+      },
+      {
+        "ticker": "ARM",
+        "market_value_yen": 202111,
+        "today_change_percent": -6.67
+      },
+      {
+        "ticker": "IONQ",
+        "market_value_yen": 478736,
+        "today_change_percent": -5.81
+      },
+      {
+        "ticker": "RGTI",
+        "market_value_yen": 635847,
+        "today_change_percent": -5.14
+      },
+      {
+        "ticker": "ARQQ",
+        "market_value_yen": 473492,
+        "today_change_percent": -9.73
+      },
+      {
+        "ticker": "IONL",
+        "market_value_yen": 829868,
+        "today_change_percent": -11.81
+      }
+    ]
   }
 ]
